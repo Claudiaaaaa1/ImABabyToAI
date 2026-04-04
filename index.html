@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claudia's Portfolio</title>
+    <title>Claudia - Liquid Aurora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,73 +14,407 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #fbbf24 0%, #f472b6 50%, #ec4899 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        :root {
+            --cyan: #00f5ff;
+            --magenta: #ff00ff;
+            --gold: #ffd700;
+            --deep-black: #050508;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 60px 50px;
-            max-width: 600px;
-            text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--deep-black);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        #fluid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            pointer-events: none;
+        }
+
+        .title-container {
+            position: relative;
+            margin-bottom: 60px;
         }
 
         h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 24px;
-            letter-spacing: -1px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(
+                135deg,
+                var(--cyan) 0%,
+                var(--magenta) 50%,
+                var(--gold) 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            filter: drop-shadow(0 0 40px rgba(0, 245, 255, 0.5));
+            animation: titlePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { filter: drop-shadow(0 0 40px rgba(0, 245, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 80px rgba(255, 0, 255, 0.8)); }
+        }
+
+        .title-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .intro {
-            font-size: 1.25rem;
-            line-height: 1.8;
-            color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 0 auto;
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 600px;
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 0.05em;
         }
 
-        .highlight {
-            color: #fef3c7;
+        .intro .highlight {
+            color: var(--cyan);
+            font-style: italic;
             font-weight: 600;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
         }
 
-        @media (max-width: 640px) {
-            h1 {
-                font-size: 2.5rem;
-            }
+        .cursor-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+            background: radial-gradient(circle,
+                rgba(0, 245, 255, 0.15) 0%,
+                rgba(255, 0, 255, 0.1) 40%,
+                transparent 70%
+            );
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            transition: opacity 0.3s ease;
+        }
 
-            .intro {
-                font-size: 1.1rem;
-            }
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
 
-            .container {
-                padding: 40px 30px;
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--cyan);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
             }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hello I'm Claudia</h1>
+    <canvas id="fluid-canvas"></canvas>
+    <div class="cursor-glow" id="cursor"></div>
+    <div class="particles" id="particles"></div>
+    <div class="noise-overlay"></div>
+
+    <div class="content">
+        <div class="title-container">
+            <div class="title-glow">Hello I'm Claudia</div>
+            <h1>Hello I'm Claudia</h1>
+        </div>
         <p class="intro">
-            热爱技术与创造的探索者，喜欢将想象变为现实。
-            目前正在学习 Web 开发，期待用代码构建美好的数字世界。
+            热爱技术与创造的探索者，喜欢将想象变为现实。<br>
+            目前正在学习 Web 开发，期待用代码构建美好的数字世界。<br>
             <span class="highlight">让我们一起创造无限可能！</span>
         </p>
     </div>
+
+    <script>
+        // Fluid Simulation Canvas
+        const canvas = document.getElementById('fluid-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let mouseX = 0, mouseY = 0;
+        let prevMouseX = 0, prevMouseY = 0;
+        let mouseSpeed = 0;
+
+        // Configuration
+        const config = {
+            particleCount: 1500,
+            connectionDistance: 100,
+            mouseRadius: 200,
+            baseSpeed: 0.5,
+            colors: ['#00f5ff', '#ff00ff', '#ffd700', '#ff0080', '#00ffff']
+        };
+
+        // Particles for fluid effect
+        const particles = [];
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * config.baseSpeed;
+                this.vy = (Math.random() - 0.5) * config.baseSpeed;
+                this.radius = Math.random() * 2 + 0.5;
+                this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.life = Math.random() * 100;
+            }
+
+            update() {
+                // Mouse interaction - fluid ripple effect
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < config.mouseRadius) {
+                    const force = (config.mouseRadius - dist) / config.mouseRadius;
+                    const angle = Math.atan2(dy, dx);
+                    const pushForce = force * mouseSpeed * 2;
+
+                    this.vx += Math.cos(angle) * pushForce * 0.1;
+                    this.vy += Math.sin(angle) * pushForce * 0.1;
+                }
+
+                // Apply velocity
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Damping
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+
+                // Add subtle flow
+                this.vx += Math.sin(this.life * 0.01) * 0.02;
+                this.vy += Math.cos(this.life * 0.01) * 0.02;
+
+                this.life++;
+
+                // Wrap around screen
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // Initialize particles
+        function init() {
+            resize();
+            particles.length = 0;
+            for (let i = 0; i < config.particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        // Draw connections between nearby particles
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                let connections = 0;
+                for (let j = i + 1; j < particles.length && connections < 3; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < config.connectionDistance) {
+                        const alpha = (1 - dist / config.connectionDistance) * 0.3;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = particles[i].color;
+                        ctx.globalAlpha = alpha;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                        connections++;
+                    }
+                }
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // Mouse trail effect
+        const mouseTrail = [];
+        const maxTrailLength = 20;
+
+        function updateMouseTrail() {
+            mouseTrail.push({ x: mouseX, y: mouseY, alpha: 1 });
+            if (mouseTrail.length > maxTrailLength) {
+                mouseTrail.shift();
+            }
+
+            // Draw trail
+            if (mouseTrail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(mouseTrail[0].x, mouseTrail[0].y);
+                for (let i = 1; i < mouseTrail.length; i++) {
+                    const point = mouseTrail[i];
+                    ctx.lineTo(point.x, point.y);
+                    point.alpha *= 0.9;
+                }
+
+                const gradient = ctx.createLinearGradient(
+                    mouseTrail[0].x, mouseTrail[0].y,
+                    mouseTrail[mouseTrail.length - 1].x, mouseTrail[mouseTrail.length - 1].y
+                );
+                gradient.addColorStop(0, 'rgba(0, 245, 255, 0)');
+                gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.3)');
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0.5)');
+
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            // Fade effect for trails
+            ctx.fillStyle = 'rgba(5, 5, 8, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Update mouse speed
+            const dx = mouseX - prevMouseX;
+            const dy = mouseY - prevMouseY;
+            mouseSpeed = Math.sqrt(dx * dx + dy * dy);
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+
+            // Update and draw particles
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            drawConnections();
+            updateMouseTrail();
+
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        window.addEventListener('resize', resize);
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Update cursor glow
+            const cursor = document.getElementById('cursor');
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Create floating particles
+        function createFloatingParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+
+                const colors = ['#00f5ff', '#ff00ff', '#ffd700'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
+
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize
+        init();
+        animate();
+        createFloatingParticles();
+    </script>
 </body>
 </html>
