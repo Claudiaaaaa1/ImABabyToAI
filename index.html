@@ -227,7 +227,8 @@
         const topCtx = topCanvas.getContext('2d');
 
         let width, height;
-        let mouseX = 0, mouseY = 0;
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let prevMouseX = mouseX, prevMouseY = mouseY;
         let mouseTrail = [];
 
         // 噪声函数
@@ -386,12 +387,13 @@
                 }
             }
 
-            // 在顶层画布上"擦除"（绘制透明区域）
+            // 在顶层画布上"擦除"（使用 destination-out 实现真正的透明）
             applyToTopLayer(ctx) {
                 const now = Date.now();
                 const fadeTime = 4000; // 4秒恢复
 
                 ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
 
                 this.points.forEach(point => {
                     const age = now - point.time;
@@ -399,17 +401,16 @@
                         const opacity = 1 - (age / fadeTime);
                         const softEdge = point.size * (0.8 + opacity * 0.4);
 
-                        // 创建软边渐变
+                        // 创建软边渐变 - 从中心完全擦除到边缘不擦除
                         const gradient = ctx.createRadialGradient(
                             point.x, point.y, 0,
                             point.x, point.y, softEdge
                         );
 
-                        // 从中心完全透明到边缘半透明
-                        gradient.addColorStop(0, `rgba(0, 0, 0, ${opacity * 0.9})`);
-                        gradient.addColorStop(0.4, `rgba(0, 0, 0, ${opacity * 0.6})`);
-                        gradient.addColorStop(0.7, `rgba(0, 0, 0, ${opacity * 0.3})`);
-                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
+                        gradient.addColorStop(0.4, `rgba(255, 255, 255, ${opacity * 0.7})`);
+                        gradient.addColorStop(0.7, `rgba(255, 255, 255, ${opacity * 0.3})`);
+                        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
                         ctx.fillStyle = gradient;
                         ctx.beginPath();
@@ -458,11 +459,10 @@
             requestAnimationFrame(animate);
         }
 
-        // 鼠标移动
-        // 初始化光标位置在屏幕中央
+        // 初始化光标
         const cursorEl = document.getElementById('cursor');
-        cursorEl.style.left = (window.innerWidth / 2) + 'px';
-        cursorEl.style.top = (window.innerHeight / 2) + 'px';
+        cursorEl.style.left = mouseX + 'px';
+        cursorEl.style.top = mouseY + 'px';
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
