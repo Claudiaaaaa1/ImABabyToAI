@@ -121,17 +121,17 @@
 
         /* 芭比粉 × 奶苔绿 */
         .bg-dot:nth-child(1)::before {
-            background: linear-gradient(135deg, #ff69b4 50%, #c8e6c9 50%);
+            background: linear-gradient(135deg, #FF69B4 50%, #E8F5E9 50%);
         }
 
         /* 薄香 × 松果褐 */
         .bg-dot:nth-child(2)::before {
-            background: linear-gradient(135deg, #f5f5dc 50%, #8b4513 50%);
+            background: linear-gradient(135deg, #F5F5DC 50%, #8B4513 50%);
         }
 
         /* 奶油粉 × 竹月色 */
         .bg-dot:nth-child(3)::before {
-            background: linear-gradient(135deg, #fff0f5 50%, #b2dfdb 50%);
+            background: linear-gradient(135deg, #FFF0F5 50%, #C5E1A5 50%);
         }
 
         .bg-dot.active {
@@ -161,25 +161,25 @@
     </div>
 
     <script>
-        // 三种对角线配色主题
+        // 三种对角线配色主题 - 小红书参考色值
         // 左上颜色 / 右下颜色
         const themes = [
             {
                 name: 'barbie-moss',
-                topLeft: '#ff69b4',      // 芭比粉
-                bottomRight: '#c8e6c9',   // 奶苔绿
+                topLeft: '#FF69B4',       // 芭比粉 - 鲜艳粉红
+                bottomRight: '#E8F5E9',   // 奶苔绿 - 柔和薄荷绿
                 textShadow: '0 2px 10px rgba(0,0,0,0.2)'
             },
             {
                 name: 'xiang-pine',
-                topLeft: '#f5f5dc',       // 薄香
-                bottomRight: '#8b4513',   // 松果褐
-                textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                topLeft: '#F5F5DC',       // 薄香 - 米色/米白
+                bottomRight: '#8B4513',   // 松果褐 - 深棕色
+                textShadow: '0 2px 10px rgba(0,0,0,0.4)'
             },
             {
                 name: 'cream-bamboo',
-                topLeft: '#fff0f5',       // 奶油粉
-                bottomRight: '#b2dfdb',   // 竹月色
+                topLeft: '#FFF0F5',       // 奶油粉 - 淡粉色
+                bottomRight: '#C5E1A5',   // 竹月色 - 淡竹绿
                 textShadow: '0 2px 10px rgba(0,0,0,0.15)'
             }
         ];
