@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claudia - Silk Dreams</title>
+    <title>Claudia - Color Dreams</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,7 +15,7 @@
         }
 
         body {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Noto Serif SC', 'Playfair Display', serif;
             min-height: 100vh;
             overflow: hidden;
             cursor: none;
@@ -42,70 +42,130 @@
             pointer-events: none;
         }
 
+        .title-wrapper {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .greeting {
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
         h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            font-size: clamp(3rem, 10vw, 7rem);
             font-weight: 400;
-            letter-spacing: 0.08em;
-            color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
-            margin-bottom: 40px;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            letter-spacing: 0.15em;
+            opacity: 0.7;
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: currentColor;
+            margin: 40px auto;
+            opacity: 0.4;
         }
 
         .intro {
-            font-size: clamp(1rem, 2vw, 1.4rem);
-            line-height: 2;
-            color: rgba(255, 255, 255, 0.92);
-            max-width: 500px;
+            font-size: clamp(0.95rem, 2vw, 1.2rem);
+            line-height: 2.2;
+            max-width: 420px;
             text-align: center;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            animation: fadeInUp 1.2s ease-out 0.3s both;
         }
 
+        .intro-line {
+            display: block;
+            margin: 8px 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 光标 */
         .cursor {
             position: fixed;
             width: 8px;
             height: 8px;
-            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            border: 1.5px solid;
             border-radius: 50%;
             pointer-events: none;
             z-index: 1000;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            transition: width 0.15s, height 0.15s, border-width 0.15s;
+            transition: width 0.2s, height 0.2s, border-width 0.2s, transform 0.1s;
+            mix-blend-mode: difference;
         }
 
         .cursor.dragging {
-            width: 14px;
-            height: 14px;
-            border-width: 2px;
-            background: rgba(255, 255, 255, 0.15);
+            width: 40px;
+            height: 40px;
+            border-width: 1px;
         }
 
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            opacity: 0.6;
+        }
+
+        /* 切换指示器 */
         .bg-indicator {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
             display: flex;
-            gap: 15px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            gap: 16px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             pointer-events: auto;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .bg-dot {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.4s ease;
-            border: 2px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -117,6 +177,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            transition: transform 0.4s ease;
         }
 
         /* 芭比粉 × 苔绿 */
@@ -126,33 +187,89 @@
 
         /* 薄香 × 松果褐 */
         .bg-dot:nth-child(2)::before {
-            background: linear-gradient(135deg, #F5F5DC 50%, #8B4513 50%);
+            background: linear-gradient(135deg, #DBC6B4 50%, #664B3A 50%);
         }
 
         /* 奶油粉 × 竹月色 */
         .bg-dot:nth-child(3)::before {
-            background: linear-gradient(135deg, #FFF0F5 50%, #C5E1A5 50%);
+            background: linear-gradient(135deg, #F3D8C3 50%, #6090B8 50%);
+        }
+
+        .bg-dot:hover {
+            transform: scale(1.1);
         }
 
         .bg-dot.active {
             transform: scale(1.15);
             border-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+
+        /* 页码指示 */
+        .page-indicator {
+            position: fixed;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .page-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .page-dot.active {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.5);
+        }
+
+        /* 提示文字 */
+        .hint {
+            position: fixed;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            opacity: 0;
+            animation: fadeInOut 4s ease 1s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
+
     <div class="cursor" id="cursor"></div>
 
-    <div class="content">
-        <h1>Hello I'm Claudia</h1>
-        <p class="intro">
-            热爱技术与创造的探索者<br>
-            喜欢将想象变为现实<br>
-            让我们一起创造无限可能
+    <div class="content" id="content">
+        <div class="title-wrapper">
+            <div class="greeting" id="greeting">Welcome to</div>
+            <h1 id="title">Claudia's Space</h1>
+            <div class="subtitle" id="subtitle">探索 · 创造 · 梦想</div>
+            <div class="divider"></div>
+        </div>
+        <p class="intro" id="intro">
+            <span class="intro-line">热爱技术与艺术的探索者</span>
+            <span class="intro-line">用代码描绘心中的色彩</span>
+            <span class="intro-line">让想象成为现实</span>
         </p>
     </div>
+
+    <div class="hint" id="hint">点击切换色彩</div>
 
     <div class="bg-indicator">
         <div class="bg-dot active" data-bg="0"></div>
@@ -160,27 +277,71 @@
         <div class="bg-dot" data-bg="2"></div>
     </div>
 
+    <div class="page-indicator">
+        <div class="page-dot active" data-page="0"></div>
+        <div class="page-dot" data-page="1"></div>
+        <div class="page-dot" data-page="2"></div>
+    </div>
+
     <script>
-        // 三种对角线配色主题 - 小红书参考色值
-        // 左上颜色 / 右下颜色
+        // 三种配色主题 - 准确色值
         const themes = [
             {
                 name: 'barbie-moss',
-                topLeft: '#F1BBC9',       // 芭比粉 - 柔和粉红
-                bottomRight: '#4D613C',   // 苔绿 - 深橄榄绿
-                textShadow: '0 2px 10px rgba(0,0,0,0.25)'
+                colors: {
+                    left: '#F1BBC9',      // 芭比粉
+                    right: '#4D613C'      // 苔绿
+                },
+                text: {
+                    greeting: 'Pink & Moss',
+                    title: 'Claudia',
+                    subtitle: '温柔 · 生机 · 希望',
+                    intro: ['在粉色的梦境中', '寻找生命的绿意', '让温柔与力量共存'],
+                    hint: '滑动鼠标，拨开色彩'
+                },
+                style: {
+                    textColor: '#FFFFFF',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.3)',
+                    cursorColor: '#FFFFFF'
+                }
             },
             {
                 name: 'xiang-pine',
-                topLeft: '#F5F5DC',       // 薄香 - 米色/米白
-                bottomRight: '#8B4513',   // 松果褐 - 深棕色
-                textShadow: '0 2px 10px rgba(0,0,0,0.4)'
+                colors: {
+                    left: '#DBC6B4',      // 薄香
+                    right: '#664B3A'      // 松果褐
+                },
+                text: {
+                    greeting: 'Warm & Earthy',
+                    title: 'Claudia',
+                    subtitle: '自然 · 质朴 · 沉淀',
+                    intro: ['如薄香般温暖', '似松果般沉稳', '在时光中沉淀自我'],
+                    hint: '滑动鼠标，感受温暖'
+                },
+                style: {
+                    textColor: '#F5F0E8',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.4)',
+                    cursorColor: '#F5F0E8'
+                }
             },
             {
                 name: 'cream-bamboo',
-                topLeft: '#FFF0F5',       // 奶油粉 - 淡粉色
-                bottomRight: '#C5E1A5',   // 竹月色 - 淡竹绿
-                textShadow: '0 2px 10px rgba(0,0,0,0.15)'
+                colors: {
+                    left: '#F3D8C3',      // 奶油粉
+                    right: '#6090B8'      // 竹月色
+                },
+                text: {
+                    greeting: 'Cream & Moon',
+                    title: 'Claudia',
+                    subtitle: '宁静 · 清澈 · 自由',
+                    intro: ['奶油般的温柔', '月光般的清澈', '在宁静中寻找自由'],
+                    hint: '滑动鼠标，探索宁静'
+                },
+                style: {
+                    textColor: '#FFFFFF',
+                    textShadow: '0 2px 20px rgba(0,0,0,0.25)',
+                    cursorColor: '#FFFFFF'
+                }
             }
         ];
 
@@ -192,176 +353,195 @@
         let width, height;
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
+        let targetX = mouseX;
+        let targetY = mouseY;
 
-        // 绘制对角线分割背景
-        function drawBackground(theme) {
-            // 清空
-            ctx.fillStyle = theme.topLeft;
-            ctx.fillRect(0, 0, width, height);
+        // 丝绸粒子系统
+        class SilkParticle {
+            constructor() {
+                this.reset();
+            }
 
-            // 绘制右下三角形（对角线分割）
-            ctx.fillStyle = theme.bottomRight;
-            ctx.beginPath();
-            ctx.moveTo(width, 0);
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
-            ctx.closePath();
-            ctx.fill();
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.life = Math.random() * 100;
+            }
 
-            // 添加微妙的渐变过渡
-            const gradient = ctx.createLinearGradient(0, height, width, 0);
-            gradient.addColorStop(0, 'rgba(255,255,255,0)');
-            gradient.addColorStop(0.45, 'rgba(255,255,255,0)');
-            gradient.addColorStop(0.5, 'rgba(255,255,255,0.3)');
-            gradient.addColorStop(0.55, 'rgba(255,255,255,0)');
-            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            update(mouseDistance) {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life += 0.02;
 
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-        }
-
-        // 丝绸覆盖层（用于被拨开的效果）
-        let silkCanvas, silkCtx;
-
-        function initSilk() {
-            silkCanvas = document.createElement('canvas');
-            silkCanvas.width = width;
-            silkCanvas.height = height;
-            silkCtx = silkCanvas.getContext('2d');
-            drawSilk();
-        }
-
-        function drawSilk() {
-            const theme = themes[currentTheme];
-
-            // 绘制丝绸纹理（覆盖在对角线上）
-            silkCtx.clearRect(0, 0, width, height);
-
-            // 创建丝绸质感的覆盖层
-            const imageData = silkCtx.createImageData(width, height);
-            const data = imageData.data;
-
-            const tl = hexToRgb(theme.topLeft);
-            const br = hexToRgb(theme.bottomRight);
-
-            for (let y = 0; y < height; y += 4) {
-                for (let x = 0; x < width; x += 4) {
-                    // 对角线判断
-                    const diag = x / width + y / height;
-                    const isTopLeft = diag < 1;
-
-                    // 添加噪声纹理模拟丝绸
-                    const noise = (Math.random() - 0.5) * 15;
-
-                    let r, g, b;
-                    if (isTopLeft) {
-                        r = Math.min(255, tl.r + noise);
-                        g = Math.min(255, tl.g + noise);
-                        b = Math.min(255, tl.b + noise);
-                    } else {
-                        r = Math.min(255, br.r + noise);
-                        g = Math.min(255, br.g + noise);
-                        b = Math.min(255, br.b + noise);
-                    }
-
-                    // 填充4x4像素块
-                    for (let dy = 0; dy < 4 && y + dy < height; dy++) {
-                        for (let dx = 0; dx < 4 && x + dx < width; dx++) {
-                            const i = ((y + dy) * width + (x + dx)) * 4;
-                            data[i] = r;
-                            data[i + 1] = g;
-                            data[i + 2] = b;
-                            data[i + 3] = 255;
-                        }
-                    }
+                // 鼠标影响
+                if (mouseDistance < 100) {
+                    const force = (100 - mouseDistance) / 100;
+                    this.vx += (Math.random() - 0.5) * force * 0.5;
+                    this.vy += (Math.random() - 0.5) * force * 0.5;
                 }
+
+                // 边界处理
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.reset();
+                }
+
+                // 阻尼
+                this.vx *= 0.99;
+                this.vy *= 0.99;
             }
 
-            silkCtx.putImageData(imageData, 0, 0);
+            draw(ctx, color) {
+                ctx.globalAlpha = this.alpha * (0.7 + 0.3 * Math.sin(this.life));
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
         }
 
-        // 推开效果区域
-        let clearedAreas = [];
-        const maxAreas = 30;
-        const fadeTime = 3000; // 3秒恢复
+        const particles = Array.from({ length: 50 }, () => new SilkParticle());
 
-        function addClearedArea(x, y, size) {
-            clearedAreas.push({
-                x, y, size,
-                time: Date.now(),
-                opacity: 1
+        // 推开波纹
+        let ripples = [];
+
+        function addRipple(x, y) {
+            ripples.push({
+                x, y,
+                radius: 0,
+                maxRadius: 150,
+                alpha: 1,
+                time: Date.now()
             });
-
-            if (clearedAreas.length > maxAreas) {
-                clearedAreas.shift();
-            }
         }
 
-        function updateClearedAreas() {
+        function updateRipples() {
             const now = Date.now();
-            clearedAreas = clearedAreas.filter(area => {
-                const age = now - area.time;
-                if (age < fadeTime) {
-                    area.opacity = 1 - (age / fadeTime);
+            ripples = ripples.filter(r => {
+                const age = now - r.time;
+                if (age < 2000) {
+                    r.radius = (age / 2000) * r.maxRadius;
+                    r.alpha = 1 - (age / 2000);
                     return true;
                 }
                 return false;
             });
         }
 
-        function render() {
-            const theme = themes[currentTheme];
+        // 绘制对角线背景
+        function drawBackground(theme) {
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, theme.colors.left);
+            gradient.addColorStop(0.5, theme.colors.left);
+            gradient.addColorStop(0.5, theme.colors.right);
+            gradient.addColorStop(1, theme.colors.right);
 
-            // 绘制基础对角线背景
-            drawBackground(theme);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
 
-            // 绘制覆盖的丝绸层
-            if (!silkCanvas) initSilk();
+            // 添加对角线柔和过渡
+            const diagGradient = ctx.createLinearGradient(0, height, width, 0);
+            diagGradient.addColorStop(0, 'rgba(255,255,255,0)');
+            diagGradient.addColorStop(0.48, 'rgba(255,255,255,0)');
+            diagGradient.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+            diagGradient.addColorStop(0.52, 'rgba(255,255,255,0)');
+            diagGradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-            // 使用遮罩实现推开效果
-            ctx.save();
+            ctx.fillStyle = diagGradient;
+            ctx.fillRect(0, 0, width, height);
+        }
 
-            // 创建临时画布用于遮罩
-            const maskCanvas = document.createElement('canvas');
-            maskCanvas.width = width;
-            maskCanvas.height = height;
-            const maskCtx = maskCanvas.getContext('2d');
+        // 绘制推开效果
+        function drawRevealEffect(theme) {
+            // 鼠标位置推开上层
+            const dx = mouseX - width / 2;
+            const dy = mouseY - height / 2;
 
-            // 遮罩：黑色=不透明，白色=透明
-            maskCtx.fillStyle = 'black';
-            maskCtx.fillRect(0, 0, width, height);
-
-            // 推开区域是白色（透明）
-            updateClearedAreas();
-            clearedAreas.forEach(area => {
-                const gradient = maskCtx.createRadialGradient(
-                    area.x, area.y, 0,
-                    area.x, area.y, area.size
-                );
-                gradient.addColorStop(0, `rgba(255,255,255,${area.opacity})`);
-                gradient.addColorStop(0.5, `rgba(255,255,255,${area.opacity * 0.5})`);
+            // 绘制波纹
+            ripples.forEach(r => {
+                const gradient = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.radius);
+                gradient.addColorStop(0, `rgba(255,255,255,${r.alpha * 0.3})`);
+                gradient.addColorStop(0.5, `rgba(255,255,255,${r.alpha * 0.1})`);
                 gradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-                maskCtx.fillStyle = gradient;
-                maskCtx.beginPath();
-                maskCtx.arc(area.x, area.y, area.size, 0, Math.PI * 2);
-                maskCtx.fill();
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.fill();
             });
 
-            // 应用遮罩
-            ctx.globalCompositeOperation = 'destination-in';
-            ctx.drawImage(maskCanvas, 0, 0);
+            // 鼠标周围的光晕
+            const mouseGradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 120);
+            mouseGradient.addColorStop(0, 'rgba(255,255,255,0.2)');
+            mouseGradient.addColorStop(0.5, 'rgba(255,255,255,0.05)');
+            mouseGradient.addColorStop(1, 'rgba(255,255,255,0)');
 
-            // 绘制丝绸
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(silkCanvas, 0, 0);
+            ctx.fillStyle = mouseGradient;
+            ctx.beginPath();
+            ctx.arc(mouseX, mouseY, 120, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
-            ctx.restore();
+        // 绘制粒子
+        function drawParticles(theme) {
+            const isDark = currentTheme === 1;
+            const particleColor = isDark ? '#F5F0E8' : '#FFFFFF';
 
-            // 添加星光点缀
-            drawStars();
+            particles.forEach(p => {
+                const dist = Math.sqrt((p.x - mouseX) ** 2 + (p.y - mouseY) ** 2);
+                p.update(dist);
+                p.draw(ctx, particleColor);
+            });
+        }
 
-            // 更新光标
+        // 更新文字内容
+        function updateText(theme) {
+            document.getElementById('greeting').textContent = theme.text.greeting;
+            document.getElementById('title').textContent = theme.text.title;
+            document.getElementById('subtitle').textContent = theme.text.subtitle;
+
+            const introLines = document.querySelectorAll('.intro-line');
+            theme.text.intro.forEach((line, i) => {
+                if (introLines[i]) introLines[i].textContent = line;
+            });
+
+            document.getElementById('hint').textContent = theme.text.hint;
+
+            // 更新样式
+            const content = document.getElementById('content');
+            content.style.color = theme.style.textColor;
+            content.style.textShadow = theme.style.textShadow;
+
+            const cursor = document.getElementById('cursor');
+            cursor.style.borderColor = theme.style.cursorColor;
+            cursor.style.boxShadow = `0 0 10px ${theme.style.cursorColor}80`;
+        }
+
+        // 渲染循环
+        function render() {
+            // 平滑鼠标跟随
+            mouseX += (targetX - mouseX) * 0.15;
+            mouseY += (targetY - mouseY) * 0.15;
+
+            const theme = themes[currentTheme];
+
+            // 绘制背景
+            drawBackground(theme);
+
+            // 绘制推开效果
+            drawRevealEffect(theme);
+
+            // 绘制粒子
+            drawParticles(theme);
+
+            // 更新波纹
+            updateRipples();
+
+            // 更新光标位置
             const cursor = document.getElementById('cursor');
             cursor.style.left = mouseX + 'px';
             cursor.style.top = mouseY + 'px';
@@ -369,70 +549,36 @@
             requestAnimationFrame(render);
         }
 
-        function drawStars() {
-            const time = Date.now() * 0.001;
-            const theme = themes[currentTheme];
-            const isDarkTheme = currentTheme === 1; // 薄香×松果褐
-
-            ctx.fillStyle = isDarkTheme ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.7)';
-
-            for (let i = 0; i < 40; i++) {
-                const x = ((i * 137.5 + time * 8) % 1) * width;
-                const y = ((i * 73.3 + Math.sin(time + i) * 30) % 1) * height;
-                const twinkle = Math.sin(time * 2 + i * 0.5);
-                const alpha = 0.4 + 0.4 * twinkle;
-                const size = 0.5 + Math.sin(i) * 0.3;
-
-                ctx.globalAlpha = alpha;
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1;
-        }
-
-        function hexToRgb(hex) {
-            return {
-                r: parseInt(hex.slice(1, 3), 16),
-                g: parseInt(hex.slice(3, 5), 16),
-                b: parseInt(hex.slice(5, 7), 16)
-            };
-        }
-
         function init() {
             resize();
+            updateText(themes[currentTheme]);
             render();
         }
 
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            initSilk();
         }
 
         // 鼠标事件
-        let lastX = mouseX, lastY = mouseY;
-
         document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            // 鼠标移动时添加推开区域
-            const dx = mouseX - lastX;
-            const dy = mouseY - lastY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist > 10) {
-                addClearedArea(mouseX, mouseY, 60 + Math.random() * 40);
-                lastX = mouseX;
-                lastY = mouseY;
-            }
+            targetX = e.clientX;
+            targetY = e.clientY;
         });
 
         document.addEventListener('mousedown', () => {
             document.getElementById('cursor').classList.add('dragging');
-            // 点击产生大范围推开
-            addClearedArea(mouseX, mouseY, 120);
+            addRipple(mouseX, mouseY);
+
+            // 连续波纹
+            for (let i = 1; i <= 3; i++) {
+                setTimeout(() => {
+                    addRipple(
+                        mouseX + (Math.random() - 0.5) * 60,
+                        mouseY + (Math.random() - 0.5) * 60
+                    );
+                }, i * 100);
+            }
         });
 
         document.addEventListener('mouseup', () => {
@@ -442,56 +588,50 @@
         // 触摸支持
         document.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            mouseX = touch.clientX;
-            mouseY = touch.clientY;
+            targetX = touch.clientX;
+            targetY = touch.clientY;
+        }, { passive: true });
 
-            const dx = mouseX - lastX;
-            const dy = mouseY - lastY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist > 10) {
-                addClearedArea(mouseX, mouseY, 60 + Math.random() * 40);
-                lastX = mouseX;
-                lastY = mouseY;
-            }
+        document.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            addRipple(touch.clientX, touch.clientY);
         }, { passive: true });
 
         // 切换主题
         function switchTheme(index) {
             currentTheme = index !== undefined ? index : (currentTheme + 1) % 3;
 
+            // 更新指示器
             document.querySelectorAll('.bg-dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === currentTheme);
             });
 
-            // 重置推开区域
-            clearedAreas = [];
+            document.querySelectorAll('.page-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentTheme);
+            });
 
-            // 重新初始化丝绸
-            initSilk();
+            // 更新文字
+            updateText(themes[currentTheme]);
 
-            // 更新文字阴影
-            const theme = themes[currentTheme];
-            document.querySelector('h1').style.textShadow = theme.textShadow;
-            document.querySelector('.intro').style.textShadow = theme.textShadow;
+            // 重置粒子
+            particles.forEach(p => p.reset());
+            ripples = [];
         }
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.bg-indicator')) {
+            if (!e.target.closest('.bg-indicator') && !e.target.closest('.page-indicator')) {
                 switchTheme();
             }
         });
 
-        document.querySelectorAll('.bg-dot').forEach(dot => {
+        document.querySelectorAll('.bg-dot, .page-dot').forEach(dot => {
             dot.addEventListener('click', () => {
-                switchTheme(parseInt(dot.dataset.bg));
+                const index = parseInt(dot.dataset.bg || dot.dataset.page);
+                switchTheme(index);
             });
         });
 
-        window.addEventListener('resize', () => {
-            resize();
-            initSilk();
-        });
+        window.addEventListener('resize', resize);
 
         // 启动
         init();
