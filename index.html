@@ -65,21 +65,22 @@
 
         .cursor {
             position: fixed;
-            width: 24px;
-            height: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.9);
+            width: 8px;
+            height: 8px;
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1000;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-            transition: width 0.15s, height 0.15s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: width 0.15s, height 0.15s, border-width 0.15s;
         }
 
         .cursor.dragging {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
+            width: 14px;
+            height: 14px;
+            border-width: 2px;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .bg-indicator {
@@ -114,15 +115,15 @@
         }
 
         .bg-dot:nth-child(1) {
-            background: linear-gradient(135deg, #e8c4d9, #a8c8ec);
+            background: linear-gradient(135deg, #ff69b4, #c8e6c9);
         }
 
         .bg-dot:nth-child(2) {
-            background: linear-gradient(135deg, #1a1a4e, #d4a574);
+            background: linear-gradient(135deg, #f5f5dc, #8b4513);
         }
 
         .bg-dot:nth-child(3) {
-            background: linear-gradient(135deg, #f4a460, #ffd700);
+            background: linear-gradient(135deg, #fff0f5, #e0f2f1);
         }
     </style>
 </head>
@@ -146,22 +147,25 @@
     </div>
 
     <script>
-        // 三种丝绸主题
+        // 三种丝绸主题 - 新配色
         const themes = [
             {
-                name: 'pink-blue',
-                top: { colors: ['#e8c4d9', '#d4a5c7', '#c9b8e0'], base: '#d4a5c7' },
-                bottom: { colors: ['#a8c8ec', '#7ab8e8', '#5a9ad9'], stars: ['#ffffff', '#e0f0ff'] }
+                name: 'barbie-moss',
+                // 芭比粉 × 奶苔绿
+                top: { colors: ['#ff69b4', '#ff85c2', '#ffa0d0'], base: '#ff69b4' },
+                bottom: { colors: ['#c8e6c9', '#a5d6a7', '#81c784'], stars: ['#ffffff', '#f1f8e9'] }
             },
             {
-                name: 'blue-gold',
-                top: { colors: ['#1a1a4e', '#2d1b69', '#4a2c7a'], base: '#1a1a4e' },
-                bottom: { colors: ['#ffd700', '#ffb347', '#ff8c42'], stars: ['#ffffff', '#fff8dc'] }
+                name: 'xiang-pine',
+                // 薄香 × 松果褐
+                top: { colors: ['#f5f5dc', '#ebe5c5', '#e0dab0'], base: '#f5f5dc' },
+                bottom: { colors: ['#8b4513', '#a0522d', '#cd853f'], stars: ['#ffffff', '#faf0e6'] }
             },
             {
-                name: 'orange-gold',
-                top: { colors: ['#f4a460', '#d4a574', '#c49a6c'], base: '#d4a574' },
-                bottom: { colors: ['#ffd700', '#ffec8b', '#daa520'], stars: ['#ffffff', '#fffacd'] }
+                name: 'cream-bamboo',
+                // 奶油粉 × 竹月色
+                top: { colors: ['#fff0f5', '#ffe4e1', '#ffd6e7'], base: '#fff0f5' },
+                bottom: { colors: ['#e0f2f1', '#b2dfdb', '#80cbc4'], stars: ['#ffffff', '#e8f5e9'] }
             }
         ];
 
