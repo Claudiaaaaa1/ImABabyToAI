@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claudia - Liquid Dreams</title>
+    <title>Claudia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
             cursor: none;
         }
 
-        #silk-canvas {
+        #art-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -43,112 +43,84 @@
             pointer-events: none;
         }
 
-        .title-container {
-            position: relative;
-            margin-bottom: 60px;
-        }
-
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 10vw, 7rem);
-            font-weight: 600;
-            letter-spacing: 0.05em;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 400;
+            letter-spacing: 0.08em;
             color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            position: relative;
-            animation: titleFloat 6s ease-in-out infinite;
-        }
-
-        @keyframes titleFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 40px;
         }
 
         .intro {
-            font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+            font-size: clamp(1rem, 2vw, 1.4rem);
             line-height: 2;
-            color: rgba(255, 255, 255, 0.92);
-            max-width: 550px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 500px;
             text-align: center;
             font-weight: 400;
-            letter-spacing: 0.08em;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.05em;
         }
 
-        .intro .highlight {
-            font-style: italic;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 1);
-        }
-
-        .cursor-silk {
+        .cursor {
             position: fixed;
-            width: 40px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             pointer-events: none;
             z-index: 100;
-            border: 1px solid rgba(255, 255, 255, 0.6);
             transform: translate(-50%, -50%);
-            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
-            mix-blend-mode: difference;
-        }
-
-        .cursor-silk.active {
-            width: 60px;
-            height: 60px;
-            border-color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.1s ease;
         }
 
         .bg-indicator {
             position: fixed;
-            bottom: 40px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
             display: flex;
-            gap: 20px;
-            padding: 16px 28px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            gap: 15px;
             pointer-events: auto;
         }
 
         .bg-dot {
-            width: 16px;
-            height: 16px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             position: relative;
+            overflow: hidden;
         }
 
-        .bg-dot::after {
+        .bg-dot::before {
             content: '';
             position: absolute;
-            inset: -6px;
+            inset: 0;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transition: all 0.4s ease;
+            opacity: 0.8;
+        }
+
+        .bg-dot:nth-child(1)::before {
+            background: radial-gradient(circle at 30% 30%, #f0d4e8, #d4a5c7, #a8c8ec);
+        }
+
+        .bg-dot:nth-child(2)::before {
+            background: radial-gradient(circle at 30% 30%, #ffd700, #d4a574, #1a1a4e);
+        }
+
+        .bg-dot:nth-child(3)::before {
+            background: radial-gradient(circle at 30% 30%, #ffd700, #f4a460, #e8c9a8);
         }
 
         .bg-dot.active {
-            transform: scale(1.4);
-            border-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-        }
-
-        .bg-dot.active::after {
-            opacity: 1;
-            inset: -8px;
-        }
-
-        .bg-dot:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
+            border-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }
 
         .bg-hint {
@@ -157,326 +129,311 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
             pointer-events: none;
             opacity: 0;
-            animation: fadeInOut 4s ease-in-out 1s forwards;
+            animation: fadeHint 3s ease 1s forwards;
         }
 
-        @keyframes fadeInOut {
+        @keyframes fadeHint {
             0%, 100% { opacity: 0; }
-            20%, 80% { opacity: 0.7; }
+            30%, 70% { opacity: 0.6; }
         }
     </style>
 </head>
 <body>
-    <canvas id="silk-canvas"></canvas>
-    <div class="cursor-silk" id="cursor"></div>
+    <canvas id="art-canvas"></canvas>
+    <div class="cursor" id="cursor"></div>
 
     <div class="content">
-        <div class="title-container">
-            <h1>Hello I'm Claudia</h1>
-        </div>
+        <h1>Hello I'm Claudia</h1>
         <p class="intro">
-            热爱技术与创造的探索者，喜欢将想象变为现实。<br>
-            目前正在学习 Web 开发，期待用代码构建美好的数字世界。<br>
-            <span class="highlight">让我们一起创造无限可能！</span>
+            热爱技术与创造的探索者<br>
+            喜欢将想象变为现实<br>
+            让我们一起创造无限可能
         </p>
     </div>
 
-    <div class="bg-hint">点击切换鎏金绸缎</div>
-    <div class="bg-indicator" id="bgIndicator">
-        <div class="bg-dot active" data-bg="0" style="background: linear-gradient(135deg, #c9b8e0, #d4a5c7, #e8c4d9);" title="粉紫梦幻"></div>
-        <div class="bg-dot" data-bg="1" style="background: linear-gradient(135deg, #1e3a5f, #4a2c7a, #d4a574);" title="深蓝金辉"></div>
-        <div class="bg-dot" data-bg="2" style="background: linear-gradient(135deg, #d4a574, #c49a6c, #e8c9a8);" title="暖橙金霞"></div>
+    <div class="bg-hint">点击切换</div>
+    <div class="bg-indicator">
+        <div class="bg-dot active" data-bg="0"></div>
+        <div class="bg-dot" data-bg="1"></div>
+        <div class="bg-dot" data-bg="2"></div>
     </div>
 
     <script>
-        // 三种鎏金绸缎主题 - 精确匹配参考图片色彩
+        // 三种主题配色 - 精确提取自参考图片
         const themes = [
             {
-                name: 'dreamy',
-                // 粉紫梦幻 - 参考图片1的柔和粉紫
-                base: '#e8d5e0',
+                name: 'pink-dream',
                 colors: {
-                    primary: '#c9b8e0',      // 淡紫色
-                    secondary: '#d4a5c7',    // 粉紫色
-                    accent: '#e8c4d9',       // 浅粉色
-                    highlight: '#f0e6f0',    // 高光
-                    shadow: '#b8a8c8',       // 阴影
-                    gold: '#f5e6d3'          // 鎏金
+                    bg: ['#e8d5e0', '#d4c4e0', '#c9d4e8'],
+                    swirl: ['#f0d4e8', '#e8c4d9', '#d4a5c7', '#a8c8ec', '#c9b8e0'],
+                    stars: ['#ffffff', '#fff5f8', '#f0f8ff'],
+                    gold: '#f5e6d3'
                 }
             },
             {
-                name: 'nebula',
-                // 深蓝金辉 - 参考图片2的深邃蓝紫+金
-                base: '#1a1a2e',
+                name: 'blue-gold',
                 colors: {
-                    primary: '#1e3a5f',      // 深蓝色
-                    secondary: '#4a2c7a',    // 紫蓝色
-                    accent: '#d4a574',       // 橙金色
-                    highlight: '#5a4a8a',    // 高光紫
-                    shadow: '#0f0f1a',       // 深阴影
-                    gold: '#ffb347'          // 亮金
+                    bg: ['#0d1a2e', '#1a1a4e', '#2d1b69'],
+                    swirl: ['#ff8c42', '#ffb347', '#4a2c7a', '#6b3d8f', '#1e3a5f'],
+                    stars: ['#ffffff', '#fff8dc', '#ffd700', '#ffe4b5'],
+                    gold: '#ffd700'
                 }
             },
             {
-                name: 'golden',
-                // 暖橙金霞 - 参考图片3的温暖金橙
-                base: '#e8d4c4',
+                name: 'warm-gold',
                 colors: {
-                    primary: '#d4a574',      // 暖金色
-                    secondary: '#c49a6c',    // 橙金色
-                    accent: '#e8c9a8',       // 浅金色
-                    highlight: '#f5e6d3',    // 高光
-                    shadow: '#b8956a',       // 阴影
-                    gold: '#ffd700'          // 亮金
+                    bg: ['#f5e6d3', '#e8d4c4', '#d4c4b0'],
+                    swirl: ['#ffd700', '#f4a460', '#ff7f50', '#e8c9a8', '#d4a574'],
+                    stars: ['#ffffff', '#fffacd', '#ffe4b5'],
+                    gold: '#ffd700'
                 }
             }
         ];
 
         let currentTheme = 0;
-        let isMouseDown = false;
 
-        // Canvas setup
-        const canvas = document.getElementById('silk-canvas');
+        const canvas = document.getElementById('art-canvas');
         const ctx = canvas.getContext('2d');
 
         let width, height;
         let mouseX = 0, mouseY = 0;
         let prevMouseX = 0, prevMouseY = 0;
 
-        // 鎏金绸缎流体系统
-        class SilkFluid {
+        // 噪声函数
+        class SimpleNoise {
             constructor() {
-                this.grid = [];
-                this.gridSize = 8; // 网格精度
-                this.cols = 0;
-                this.rows = 0;
-                this.damping = 0.96;
-                this.time = 0;
-                this.initGrid();
+                this.perm = new Uint8Array(512);
+                for (let i = 0; i < 256; i++) this.perm[i] = i;
+                for (let i = 255; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.perm[i], this.perm[j]] = [this.perm[j], this.perm[i]];
+                }
+                for (let i = 0; i < 256; i++) this.perm[i + 256] = this.perm[i];
             }
 
-            initGrid() {
-                this.cols = Math.ceil(width / this.gridSize) + 2;
-                this.rows = Math.ceil(height / this.gridSize) + 2;
-                this.grid = [];
+            fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+            lerp(t, a, b) { return a + t * (b - a); }
+            grad(hash, x, y) {
+                const h = hash & 15;
+                const u = h < 8 ? x : y;
+                const v = h < 4 ? y : h === 12 || h === 14 ? x : 0;
+                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+            }
 
-                for (let i = 0; i < this.cols; i++) {
-                    this.grid[i] = [];
-                    for (let j = 0; j < this.rows; j++) {
-                        this.grid[i][j] = {
-                            x: i * this.gridSize,
-                            y: j * this.gridSize,
-                            originalX: i * this.gridSize,
-                            originalY: j * this.gridSize,
-                            vx: 0,
-                            vy: 0,
-                            displacement: 0
-                        };
-                    }
+            noise(x, y) {
+                const X = Math.floor(x) & 255;
+                const Y = Math.floor(y) & 255;
+                x -= Math.floor(x);
+                y -= Math.floor(y);
+                const u = this.fade(x);
+                const v = this.fade(y);
+                const A = this.perm[X] + Y, B = this.perm[X + 1] + Y;
+
+                return this.lerp(v,
+                    this.lerp(u, this.grad(this.perm[A], x, y), this.grad(this.perm[B], x - 1, y)),
+                    this.lerp(u, this.grad(this.perm[A + 1], x, y - 1), this.grad(this.perm[B + 1], x - 1, y - 1))
+                );
+            }
+        }
+
+        const noise = new SimpleNoise();
+
+        // 流体艺术系统
+        class FluidArt {
+            constructor() {
+                this.time = 0;
+                this.stars = [];
+                this.initStars();
+            }
+
+            initStars() {
+                this.stars = [];
+                for (let i = 0; i < 100; i++) {
+                    this.stars.push({
+                        x: Math.random(),
+                        y: Math.random(),
+                        size: Math.random() * 2 + 0.5,
+                        brightness: Math.random(),
+                        twinkle: Math.random() * Math.PI * 2
+                    });
                 }
             }
 
-            applyForce(x, y, force, radius) {
-                const gridX = Math.floor(x / this.gridSize);
-                const gridY = Math.floor(y / this.gridSize);
-                const affectRadius = Math.ceil(radius / this.gridSize);
+            // 绘制流体漩涡纹理
+            drawFluidTexture(colors) {
+                const imageData = ctx.createImageData(width, height);
+                const data = imageData.data;
 
-                for (let i = -affectRadius; i <= affectRadius; i++) {
-                    for (let j = -affectRadius; j <= affectRadius; j++) {
-                        const col = gridX + i;
-                        const row = gridY + j;
+                const cx = width / 2;
+                const cy = height / 2;
+                const time = this.time * 0.0003;
 
-                        if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
-                            const point = this.grid[col][row];
-                            const dx = point.originalX - x;
-                            const dy = point.originalY - y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
+                // 预计算颜色
+                const parseColor = (hex) => ({
+                    r: parseInt(hex.slice(1, 3), 16),
+                    g: parseInt(hex.slice(3, 5), 16),
+                    b: parseInt(hex.slice(5, 7), 16)
+                });
 
-                            if (dist < radius) {
-                                const factor = (1 - dist / radius) * force;
-                                const angle = Math.atan2(dy, dx);
+                const bgColors = colors.bg.map(parseColor);
+                const swirlColors = colors.swirl.map(parseColor);
 
-                                // 绸缎般的流动 - 垂直于运动方向的波动
-                                point.vx += Math.cos(angle) * factor * 0.5;
-                                point.vy += Math.sin(angle) * factor * 0.5;
-                                point.displacement += factor;
+                for (let y = 0; y < height; y += 2) {
+                    for (let x = 0; x < width; x += 2) {
+                        const dx = x - cx;
+                        const dy = y - cy;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const angle = Math.atan2(dy, dx);
+
+                        // 漩涡扭曲
+                        const twist = angle + dist * 0.002 + time;
+                        const n1 = noise.noise(
+                            Math.cos(twist) * dist * 0.003 + time,
+                            Math.sin(twist) * dist * 0.003
+                        );
+                        const n2 = noise.noise(
+                            x * 0.002 + n1 * 0.5,
+                            y * 0.002 + time * 0.5
+                        );
+
+                        // 混合颜色
+                        const mix = (n1 + 1) * 0.5;
+                        const mix2 = (n2 + 1) * 0.5;
+
+                        // 选择基础色
+                        const bgIndex = Math.floor(mix * (bgColors.length - 1));
+                        const bg1 = bgColors[bgIndex];
+                        const bg2 = bgColors[Math.min(bgIndex + 1, bgColors.length - 1)];
+                        const bgT = mix * (bgColors.length - 1) - bgIndex;
+
+                        // 选择漩涡色
+                        const swirlIndex = Math.floor(mix2 * (swirlColors.length - 1));
+                        const s1 = swirlColors[swirlIndex];
+                        const s2 = swirlColors[Math.min(swirlIndex + 1, swirlColors.length - 1)];
+                        const sT = mix2 * (swirlColors.length - 1) - swirlIndex;
+
+                        // 插值
+                        const blend = Math.min(dist / (Math.max(width, height) * 0.6), 1);
+                        const finalMix = blend * 0.7 + n2 * 0.3;
+
+                        const r = Math.floor(
+                            this.lerp(finalMix,
+                                this.lerp(bgT, bg1.r, bg2.r),
+                                this.lerp(sT, s1.r, s2.r)
+                            )
+                        );
+                        const g = Math.floor(
+                            this.lerp(finalMix,
+                                this.lerp(bgT, bg1.g, bg2.g),
+                                this.lerp(sT, s1.g, s2.g)
+                            )
+                        );
+                        const b = Math.floor(
+                            this.lerp(finalMix,
+                                this.lerp(bgT, bg1.b, bg2.b),
+                                this.lerp(sT, s1.b, s2.b)
+                            )
+                        );
+
+                        // 填充2x2像素块
+                        for (let dy = 0; dy < 2 && y + dy < height; dy++) {
+                            for (let dx = 0; dx < 2 && x + dx < width; dx++) {
+                                const i = ((y + dy) * width + (x + dx)) * 4;
+                                data[i] = r;
+                                data[i + 1] = g;
+                                data[i + 2] = b;
+                                data[i + 3] = 255;
                             }
                         }
                     }
                 }
+
+                ctx.putImageData(imageData, 0, 0);
             }
 
-            update() {
-                this.time += 0.016;
+            lerp(t, a, b) {
+                return a + t * (b - a);
+            }
 
-                // 更新每个点的物理
-                for (let i = 0; i < this.cols; i++) {
-                    for (let j = 0; j < this.rows; j++) {
-                        const point = this.grid[i][j];
+            // 绘制星星
+            drawStars(colors) {
+                const starColors = colors.stars;
 
-                        // 应用速度
-                        point.x += point.vx;
-                        point.y += point.vy;
+                this.stars.forEach(star => {
+                    const x = star.x * width;
+                    const y = star.y * height;
+                    const twinkle = Math.sin(this.time * 0.002 + star.twinkle);
+                    const alpha = star.brightness * (0.5 + 0.5 * twinkle);
 
-                        // 弹性恢复力（绸缎质感）
-                        const restoreX = (point.originalX - point.x) * 0.08;
-                        const restoreY = (point.originalY - point.y) * 0.08;
+                    const color = starColors[Math.floor(star.x * starColors.length)];
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = alpha;
 
-                        point.vx += restoreX;
-                        point.vy += restoreY;
+                    // 绘制星星
+                    ctx.beginPath();
+                    ctx.arc(x, y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
 
-                        // 阻尼（能量衰减）
-                        point.vx *= this.damping;
-                        point.vy *= this.damping;
-                        point.displacement *= 0.95;
-
-                        // 与邻居的约束（保持绸缎连续性）
-                        if (i > 0) {
-                            const left = this.grid[i-1][j];
-                            const stretch = (left.x - point.x) * 0.02;
-                            point.vx += stretch;
-                            left.vx -= stretch;
-                        }
-                        if (j > 0) {
-                            const top = this.grid[i][j-1];
-                            const stretch = (top.y - point.y) * 0.02;
-                            point.vy += stretch;
-                            top.vy -= stretch;
-                        }
+                    // 星光十字
+                    if (star.size > 1.2) {
+                        ctx.globalAlpha = alpha * 0.5;
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 0.5;
+                        const glow = star.size * 3;
+                        ctx.beginPath();
+                        ctx.moveTo(x - glow, y);
+                        ctx.lineTo(x + glow, y);
+                        ctx.moveTo(x, y - glow);
+                        ctx.lineTo(x, y + glow);
+                        ctx.stroke();
                     }
-                }
+                });
 
-                // 鼠标拖动产生绸缎波纹
+                ctx.globalAlpha = 1;
+            }
+
+            // 绘制交互波纹
+            drawInteraction() {
                 const dx = mouseX - prevMouseX;
                 const dy = mouseY - prevMouseY;
                 const speed = Math.sqrt(dx * dx + dy * dy);
 
-                if (speed > 2) {
-                    const force = Math.min(speed * 0.3, 8);
-                    this.applyForce(mouseX, mouseY, force, 120);
+                if (speed > 3) {
+                    const theme = themes[currentTheme];
+                    const gradient = ctx.createRadialGradient(
+                        mouseX, mouseY, 0,
+                        mouseX, mouseY, 100
+                    );
+                    gradient.addColorStop(0, theme.colors.gold + '40');
+                    gradient.addColorStop(0.5, theme.colors.gold + '20');
+                    gradient.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(mouseX, mouseY, 100, 0, Math.PI * 2);
+                    ctx.fill();
                 }
+            }
+
+            update() {
+                this.time += 16;
             }
 
             draw() {
                 const theme = themes[currentTheme];
-                const c = theme.colors;
-
-                // 绘制绸缎纹理
-                ctx.clearRect(0, 0, width, height);
-
-                // 基础渐变
-                const baseGradient = ctx.createRadialGradient(
-                    width / 2, height / 2, 0,
-                    width / 2, height / 2, Math.max(width, height) * 0.8
-                );
-                baseGradient.addColorStop(0, c.highlight);
-                baseGradient.addColorStop(0.5, c.primary);
-                baseGradient.addColorStop(1, c.secondary);
-
-                ctx.fillStyle = baseGradient;
-                ctx.fillRect(0, 0, width, height);
-
-                // 绘制变形的绸缎网格
-                this.drawSilkMesh(c);
-
-                // 绘制流光效果
-                this.drawFlowLight(c);
-
-                // 添加微光颗粒
-                this.drawSparkles(c);
-            }
-
-            drawSilkMesh(colors) {
-                // 使用变形的网格绘制绸缎感
-                for (let i = 0; i < this.cols - 1; i++) {
-                    for (let j = 0; j < this.rows - 1; j++) {
-                        const p1 = this.grid[i][j];
-                        const p2 = this.grid[i + 1][j];
-                        const p3 = this.grid[i + 1][j + 1];
-                        const p4 = this.grid[i][j + 1];
-
-                        // 计算变形程度
-                        const displacement = (p1.displacement + p2.displacement + p3.displacement + p4.displacement) / 4;
-
-                        if (displacement > 0.1) {
-                            // 变形处的高光
-                            const alpha = Math.min(displacement * 0.15, 0.4);
-                            const gradient = ctx.createLinearGradient(p1.x, p1.y, p3.x, p3.y);
-                            gradient.addColorStop(0, this.hexToRgba(colors.highlight, 0));
-                            gradient.addColorStop(0.5, this.hexToRgba(colors.gold, alpha));
-                            gradient.addColorStop(1, this.hexToRgba(colors.highlight, 0));
-
-                            ctx.fillStyle = gradient;
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.lineTo(p3.x, p3.y);
-                            ctx.lineTo(p4.x, p4.y);
-                            ctx.closePath();
-                            ctx.fill();
-                        }
-                    }
-                }
-            }
-
-            drawFlowLight(colors) {
-                // 丝绸流光效果
-                const time = this.time;
-
-                for (let i = 0; i < 5; i++) {
-                    const offset = i * 100;
-                    const x = (Math.sin(time * 0.3 + i) * 0.3 + 0.5) * width;
-                    const y = (Math.cos(time * 0.2 + i * 0.5) * 0.3 + 0.5) * height;
-
-                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 300);
-                    gradient.addColorStop(0, this.hexToRgba(colors.gold, 0.15));
-                    gradient.addColorStop(0.5, this.hexToRgba(colors.accent, 0.08));
-                    gradient.addColorStop(1, 'transparent');
-
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, width, height);
-                }
-            }
-
-            drawSparkles(colors) {
-                // 微光颗粒
-                const time = this.time;
-                ctx.fillStyle = colors.highlight;
-
-                for (let i = 0; i < 30; i++) {
-                    const x = (i * 137.5 + time * 20) % width;
-                    const y = (i * 73.3 + Math.sin(time + i) * 50) % height;
-                    const size = 1 + Math.sin(time * 2 + i) * 0.5;
-                    const alpha = 0.3 + Math.sin(time * 3 + i) * 0.2;
-
-                    ctx.globalAlpha = alpha;
-                    ctx.beginPath();
-                    ctx.arc(x, y, size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.globalAlpha = 1;
-            }
-
-            hexToRgba(hex, alpha) {
-                const r = parseInt(hex.slice(1, 3), 16);
-                const g = parseInt(hex.slice(3, 5), 16);
-                const b = parseInt(hex.slice(5, 7), 16);
-                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-            }
-
-            resize() {
-                this.initGrid();
+                this.drawFluidTexture(theme.colors);
+                this.drawStars(theme.colors);
+                this.drawInteraction();
             }
         }
 
-        const silk = new SilkFluid();
+        const fluidArt = new FluidArt();
 
-        // 初始化
         function init() {
             resize();
         }
@@ -484,13 +441,16 @@
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            silk.resize();
+            fluidArt.initStars();
         }
 
-        // 动画循环
-        function animate() {
-            silk.update();
-            silk.draw();
+        let lastDraw = 0;
+        function animate(timestamp) {
+            if (timestamp - lastDraw > 50) { // 20fps for performance
+                fluidArt.update();
+                fluidArt.draw();
+                lastDraw = timestamp;
+            }
 
             prevMouseX = mouseX;
             prevMouseY = mouseY;
@@ -498,37 +458,18 @@
             requestAnimationFrame(animate);
         }
 
-        // 事件监听
         window.addEventListener('resize', resize);
 
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
 
-            // 更新光标
             const cursor = document.getElementById('cursor');
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
         });
 
-        document.addEventListener('mousedown', () => {
-            isMouseDown = true;
-            document.getElementById('cursor').classList.add('active');
-        });
-
-        document.addEventListener('mouseup', () => {
-            isMouseDown = false;
-            document.getElementById('cursor').classList.remove('active');
-        });
-
-        // 触摸支持
-        document.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            mouseX = touch.clientX;
-            mouseY = touch.clientY;
-        }, { passive: true });
-
-        // 点击切换主题
+        // 切换主题
         function switchTheme(index) {
             if (index === undefined) {
                 currentTheme = (currentTheme + 1) % themes.length;
@@ -536,34 +477,27 @@
                 currentTheme = index;
             }
 
-            // 更新指示器
             document.querySelectorAll('.bg-dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === currentTheme);
             });
 
-            // 点击产生波纹
-            silk.applyForce(width / 2, height / 2, 15, 300);
+            fluidArt.initStars();
         }
 
-        // 点击事件
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.bg-indicator')) {
                 switchTheme();
-                silk.applyForce(e.clientX, e.clientY, 10, 150);
             }
         });
 
-        // 指示器点击
         document.querySelectorAll('.bg-dot').forEach(dot => {
             dot.addEventListener('click', () => {
-                const index = parseInt(dot.dataset.bg);
-                switchTheme(index);
+                switchTheme(parseInt(dot.dataset.bg));
             });
         });
 
-        // 启动
         init();
-        animate();
+        requestAnimationFrame(animate);
     </script>
 </body>
 </html>
