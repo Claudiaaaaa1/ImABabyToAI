@@ -176,6 +176,78 @@
             opacity: 0.03;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
+
+        /* 背景切换指示器 */
+        .bg-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            gap: 12px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+
+        .bg-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .bg-dot.active {
+            transform: scale(1.3);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .bg-dot:hover {
+            transform: scale(1.2);
+        }
+
+        .bg-hint {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            animation: fadeInOut 3s ease-in-out 1s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+
+        /* 点击区域提示 */
+        .click-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .click-hint.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -196,7 +268,53 @@
         </p>
     </div>
 
+    <div class="bg-hint">点击任意处切换背景</div>
+    <div class="bg-indicator" id="bgIndicator">
+        <div class="bg-dot active" data-bg="0" style="background: linear-gradient(135deg, #1a1a4e, #ff6b35);" title="星云银河"></div>
+        <div class="bg-dot" data-bg="1" style="background: linear-gradient(135deg, #00d4aa, #b147f8);" title="极光幻境"></div>
+        <div class="bg-dot" data-bg="2" style="background: linear-gradient(135deg, #ff0040, #1a0033);" title="黑洞视界"></div>
+    </div>
+
     <script>
+        // 三种背景主题配置
+        const themes = [
+            {
+                name: 'nebula',
+                // 星云银河 - 深蓝紫底 + 橙金漩涡
+                background: {
+                    base: '#0a0a1a',
+                    gradient: ['#1a1a4e', '#2d1b69', '#4a1a6b', '#ff6b35'],
+                    starColors: ['#ffffff', '#ffe4b5', '#87ceeb', '#dda0dd', '#ff6b35'],
+                    glowColors: ['#4a90d9', '#9b59b6', '#f39c12'],
+                    trailColors: ['rgba(74, 144, 217, 0)', 'rgba(155, 89, 182, 0.3)', 'rgba(243, 156, 18, 0.5)']
+                }
+            },
+            {
+                name: 'aurora',
+                // 极光幻境 - 绿紫极光流动
+                background: {
+                    base: '#051a1a',
+                    gradient: ['#001a33', '#003d4d', '#00d4aa', '#b147f8'],
+                    starColors: ['#ffffff', '#a8f0d8', '#e0b0ff', '#00ffaa', '#ff6bff'],
+                    glowColors: ['#00d4aa', '#9d4edd', '#ff6bff'],
+                    trailColors: ['rgba(0, 212, 170, 0)', 'rgba(157, 78, 221, 0.3)', 'rgba(255, 107, 255, 0.5)']
+                }
+            },
+            {
+                name: 'blackhole',
+                // 黑洞视界 - 深红暗物质
+                background: {
+                    base: '#0d0008',
+                    gradient: ['#1a0005', '#330010', '#590018', '#ff0040'],
+                    starColors: ['#ffffff', '#ffb3ba', '#ff6b6b', '#ff0040', '#8b0000'],
+                    glowColors: ['#ff0040', '#8b0000', '#4a0080'],
+                    trailColors: ['rgba(255, 0, 64, 0)', 'rgba(139, 0, 0, 0.3)', 'rgba(74, 0, 128, 0.5)']
+                }
+            }
+        ];
+
+        let currentTheme = 0;
+
         // Fluid Simulation Canvas
         const canvas = document.getElementById('fluid-canvas');
         const ctx = canvas.getContext('2d');
@@ -207,12 +325,12 @@
         let mouseSpeed = 0;
 
         // Configuration
-        const config = {
+        let config = {
             particleCount: 1500,
             connectionDistance: 100,
             mouseRadius: 200,
             baseSpeed: 0.5,
-            colors: ['#00f5ff', '#ff00ff', '#ffd700', '#ff0080', '#00ffff']
+            colors: themes[0].background.starColors
         };
 
         // Particles for fluid effect
@@ -232,6 +350,7 @@
                 this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
                 this.alpha = Math.random() * 0.5 + 0.2;
                 this.life = Math.random() * 100;
+                this.twinkle = Math.random() * Math.PI * 2;
             }
 
             update() {
@@ -257,11 +376,41 @@
                 this.vx *= 0.98;
                 this.vy *= 0.98;
 
+                // Theme-specific movement
+                const theme = themes[currentTheme];
+                if (theme.name === 'nebula') {
+                    // 星云：漩涡运动
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const dx = this.x - centerX;
+                    const dy = this.y - centerY;
+                    const angle = Math.atan2(dy, dx);
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    this.vx += Math.cos(angle + Math.PI/2) * 0.01 * (dist / width);
+                    this.vy += Math.sin(angle + Math.PI/2) * 0.01 * (dist / width);
+                } else if (theme.name === 'aurora') {
+                    // 极光：波浪运动
+                    this.vx += Math.sin(this.life * 0.02) * 0.03;
+                    this.vy += Math.cos(this.x * 0.01 + this.life * 0.01) * 0.02;
+                } else {
+                    // 黑洞：向中心吸引
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const dx = centerX - this.x;
+                    const dy = centerY - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 50) {
+                        this.vx += dx * 0.0001;
+                        this.vy += dy * 0.0001;
+                    }
+                }
+
                 // Add subtle flow
                 this.vx += Math.sin(this.life * 0.01) * 0.02;
                 this.vy += Math.cos(this.life * 0.01) * 0.02;
 
                 this.life++;
+                this.twinkle += 0.05;
 
                 // Wrap around screen
                 if (this.x < 0) this.x = width;
@@ -273,11 +422,164 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                // 闪烁效果
+                const twinkleAlpha = this.alpha * (0.7 + 0.3 * Math.sin(this.twinkle));
                 ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.alpha;
+                ctx.globalAlpha = twinkleAlpha;
                 ctx.fill();
+
+                // 星光十字效果
+                if (this.radius > 1.5) {
+                    ctx.globalAlpha = twinkleAlpha * 0.5;
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 0.5;
+                    const glow = 4 + Math.sin(this.twinkle) * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x - glow, this.y);
+                    ctx.lineTo(this.x + glow, this.y);
+                    ctx.moveTo(this.x, this.y - glow);
+                    ctx.lineTo(this.x, this.y + glow);
+                    ctx.stroke();
+                }
                 ctx.globalAlpha = 1;
             }
+        }
+
+        // 绘制背景
+        function drawBackground() {
+            const theme = themes[currentTheme];
+            const bg = theme.background;
+
+            // 创建渐变背景
+            const gradient = ctx.createRadialGradient(
+                width / 2, height / 2, 0,
+                width / 2, height / 2, Math.max(width, height) * 0.8
+            );
+
+            bg.gradient.forEach((color, i) => {
+                gradient.addColorStop(i / (bg.gradient.length - 1), color);
+            });
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // 添加额外的视觉效果
+            if (theme.name === 'nebula') {
+                // 星云：绘制旋涡
+                drawNebulaSwirl();
+            } else if (theme.name === 'aurora') {
+                // 极光：绘制光带
+                drawAuroraBands();
+            } else {
+                // 黑洞：绘制吸积盘
+                drawBlackHoleAccretion();
+            }
+        }
+
+        // 星云漩涡
+        function drawNebulaSwirl() {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const time = Date.now() * 0.0005;
+
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(255, 107, 53, ${0.1 - i * 0.015})`;
+                ctx.lineWidth = 30 - i * 4;
+
+                for (let angle = 0; angle < Math.PI * 6; angle += 0.1) {
+                    const radius = 100 + angle * 30 + i * 20;
+                    const x = centerX + Math.cos(angle + time + i * 0.5) * radius;
+                    const y = centerY + Math.sin(angle + time + i * 0.5) * radius * 0.6;
+
+                    if (angle === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        // 极光光带
+        function drawAuroraBands() {
+            const time = Date.now() * 0.001;
+
+            for (let band = 0; band < 3; band++) {
+                const gradient = ctx.createLinearGradient(0, 0, width, 0);
+                gradient.addColorStop(0, 'rgba(0, 212, 170, 0)');
+                gradient.addColorStop(0.3, `rgba(0, 212, 170, ${0.15 - band * 0.03})`);
+                gradient.addColorStop(0.5, `rgba(157, 78, 221, ${0.2 - band * 0.04})`);
+                gradient.addColorStop(0.7, `rgba(0, 212, 170, ${0.15 - band * 0.03})`);
+                gradient.addColorStop(1, 'rgba(0, 212, 170, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+
+                for (let x = 0; x <= width; x += 10) {
+                    const y = height * 0.3 + band * 80 +
+                              Math.sin(x * 0.003 + time + band) * 50 +
+                              Math.sin(x * 0.007 + time * 1.5) * 30;
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.lineTo(width, height);
+                ctx.lineTo(0, height);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        // 黑洞吸积盘
+        function drawBlackHoleAccretion() {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const time = Date.now() * 0.001;
+
+            // 吸积盘
+            for (let i = 0; i < 8; i++) {
+                const angle = time + i * (Math.PI / 4);
+                const innerR = 80 + i * 15;
+                const outerR = 100 + i * 15;
+
+                const gradient = ctx.createRadialGradient(
+                    centerX, centerY, innerR,
+                    centerX, centerY, outerR
+                );
+                gradient.addColorStop(0, 'rgba(255, 0, 64, 0)');
+                gradient.addColorStop(0.5, `rgba(255, 0, 64, ${0.3 - i * 0.03})`);
+                gradient.addColorStop(1, 'rgba(255, 0, 64, 0)');
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle * 0.3);
+                ctx.translate(-centerX, -centerY);
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, outerR, outerR * 0.3, angle, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            // 事件视界
+            const eventHorizon = ctx.createRadialGradient(
+                centerX, centerY, 0,
+                centerX, centerY, 60
+            );
+            eventHorizon.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            eventHorizon.addColorStop(0.7, 'rgba(0, 0, 0, 0.9)');
+            eventHorizon.addColorStop(1, 'rgba(255, 0, 64, 0.5)');
+
+            ctx.fillStyle = eventHorizon;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         // Initialize particles
@@ -296,6 +598,8 @@
 
         // Draw connections between nearby particles
         function drawConnections() {
+            const theme = themes[currentTheme];
+
             for (let i = 0; i < particles.length; i++) {
                 let connections = 0;
                 for (let j = i + 1; j < particles.length && connections < 3; j++) {
@@ -319,7 +623,7 @@
             ctx.globalAlpha = 1;
         }
 
-        // Mouse trail effect
+        // Mouse trail effect - 保留的拖尾效果
         const mouseTrail = [];
         const maxTrailLength = 20;
 
@@ -339,13 +643,16 @@
                     point.alpha *= 0.9;
                 }
 
+                const theme = themes[currentTheme];
+                const trailColors = theme.background.trailColors;
+
                 const gradient = ctx.createLinearGradient(
                     mouseTrail[0].x, mouseTrail[0].y,
                     mouseTrail[mouseTrail.length - 1].x, mouseTrail[mouseTrail.length - 1].y
                 );
-                gradient.addColorStop(0, 'rgba(0, 245, 255, 0)');
-                gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.3)');
-                gradient.addColorStop(1, 'rgba(255, 215, 0, 0.5)');
+                gradient.addColorStop(0, trailColors[0]);
+                gradient.addColorStop(0.5, trailColors[1]);
+                gradient.addColorStop(1, trailColors[2]);
 
                 ctx.strokeStyle = gradient;
                 ctx.lineWidth = 3;
@@ -357,9 +664,8 @@
 
         // Animation loop
         function animate() {
-            // Fade effect for trails
-            ctx.fillStyle = 'rgba(5, 5, 8, 0.1)';
-            ctx.fillRect(0, 0, width, height);
+            // 绘制背景（覆盖上一帧）
+            drawBackground();
 
             // Update mouse speed
             const dx = mouseX - prevMouseX;
@@ -393,9 +699,58 @@
             cursor.style.top = e.clientY + 'px';
         });
 
+        // 切换背景主题
+        function switchTheme(index) {
+            if (index === undefined) {
+                currentTheme = (currentTheme + 1) % themes.length;
+            } else {
+                currentTheme = index;
+            }
+
+            const theme = themes[currentTheme];
+            config.colors = theme.background.starColors;
+
+            // 更新指示器
+            document.querySelectorAll('.bg-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentTheme);
+            });
+
+            // 更新光标颜色
+            const cursor = document.getElementById('cursor');
+            const glowColors = theme.background.glowColors;
+            cursor.style.background = `radial-gradient(circle,
+                ${glowColors[0]}26 0%,
+                ${glowColors[1]}1a 40%,
+                transparent 70%
+            )`;
+
+            // 重新初始化粒子颜色
+            particles.forEach(p => {
+                p.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+            });
+        }
+
+        // 点击切换背景
+        document.addEventListener('click', (e) => {
+            // 排除指示器点击
+            if (!e.target.closest('.bg-indicator')) {
+                switchTheme();
+            }
+        });
+
+        // 指示器点击
+        document.querySelectorAll('.bg-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.dataset.bg);
+                switchTheme(index);
+            });
+        });
+
         // Create floating particles
         function createFloatingParticles() {
             const container = document.getElementById('particles');
+            container.innerHTML = '';
+
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
@@ -403,13 +758,62 @@
                 particle.style.animationDelay = Math.random() * 15 + 's';
                 particle.style.animationDuration = (10 + Math.random() * 10) + 's';
 
-                const colors = ['#00f5ff', '#ff00ff', '#ffd700'];
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
+                const theme = themes[currentTheme];
+                const colors = theme.background.starColors.slice(0, 3);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
 
                 container.appendChild(particle);
             }
         }
+
+        // 更新浮动粒子颜色
+        function updateFloatingParticles() {
+            const theme = themes[currentTheme];
+            const colors = theme.background.starColors.slice(0, 3);
+
+            document.querySelectorAll('.particle').forEach(p => {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                p.style.background = color;
+                p.style.boxShadow = `0 0 10px ${color}`;
+            });
+        }
+
+        // 重写切换主题函数以包含浮动粒子更新
+        const originalSwitchTheme = switchTheme;
+        switchTheme = function(index) {
+            if (index === undefined) {
+                currentTheme = (currentTheme + 1) % themes.length;
+            } else {
+                currentTheme = index;
+            }
+
+            const theme = themes[currentTheme];
+            config.colors = theme.background.starColors;
+
+            // 更新指示器
+            document.querySelectorAll('.bg-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentTheme);
+            });
+
+            // 更新光标颜色
+            const cursor = document.getElementById('cursor');
+            const glowColors = theme.background.glowColors;
+            cursor.style.background = `radial-gradient(circle,
+                ${glowColors[0]}26 0%,
+                ${glowColors[1]}1a 40%,
+                transparent 70%
+            )`;
+
+            // 重新初始化粒子颜色
+            particles.forEach(p => {
+                p.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+            });
+
+            // 更新浮动粒子
+            updateFloatingParticles();
+        };
 
         // Initialize
         init();
