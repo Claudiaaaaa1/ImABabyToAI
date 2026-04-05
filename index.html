@@ -73,20 +73,21 @@
 
         .cursor {
             position: fixed;
-            width: 30px;
-            height: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             pointer-events: none;
-            z-index: 100;
+            z-index: 1000;
             transform: translate(-50%, -50%);
-            transition: width 0.3s ease, height 0.3s ease;
-            mix-blend-mode: difference;
+            transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .cursor.active {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .bg-indicator {
@@ -458,6 +459,11 @@
         }
 
         // 鼠标移动
+        // 初始化光标位置在屏幕中央
+        const cursorEl = document.getElementById('cursor');
+        cursorEl.style.left = (window.innerWidth / 2) + 'px';
+        cursorEl.style.top = (window.innerHeight / 2) + 'px';
+
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
@@ -474,14 +480,13 @@
             prevMouseX = mouseX;
             prevMouseY = mouseY;
 
-            // 更新光标
-            const cursor = document.getElementById('cursor');
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+            // 更新光标位置
+            cursorEl.style.left = e.clientX + 'px';
+            cursorEl.style.top = e.clientY + 'px';
         });
 
         document.addEventListener('mousedown', () => {
-            document.getElementById('cursor').classList.add('active');
+            cursorEl.classList.add('active');
             // 点击产生大范围的"拨开"
             for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
@@ -494,7 +499,7 @@
         });
 
         document.addEventListener('mouseup', () => {
-            document.getElementById('cursor').classList.remove('active');
+            cursorEl.classList.remove('active');
         });
 
         // 触摸支持
