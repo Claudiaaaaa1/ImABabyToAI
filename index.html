@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claudia - Liquid Dreams</title>
+    <title>Claudia - Silk Dreams</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
@@ -22,21 +22,13 @@
             cursor: none;
         }
 
-        .layer {
+        #canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-        }
-
-        #bottom-layer {
-            z-index: 0;
-        }
-
-        #top-layer {
-            z-index: 1;
         }
 
         .content {
@@ -73,18 +65,18 @@
 
         .cursor {
             position: fixed;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border: 2px solid rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1000;
             transform: translate(-50%, -50%);
-            transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            transition: width 0.15s, height 0.15s;
         }
 
-        .cursor.active {
+        .cursor.dragging {
             width: 40px;
             height: 40px;
             background: rgba(255, 255, 255, 0.1);
@@ -113,7 +105,6 @@
             cursor: pointer;
             transition: all 0.4s ease;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            position: relative;
         }
 
         .bg-dot.active {
@@ -133,33 +124,10 @@
         .bg-dot:nth-child(3) {
             background: linear-gradient(135deg, #f4a460, #ffd700);
         }
-
-        .bg-hint {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            pointer-events: none;
-            opacity: 0;
-            animation: fadeHint 3s ease 1s forwards;
-        }
-
-        @keyframes fadeHint {
-            0%, 100% { opacity: 0; }
-            30%, 70% { opacity: 0.6; }
-        }
     </style>
 </head>
 <body>
-    <!-- 下层：被揭示的颜色 -->
-    <canvas id="bottom-layer" class="layer"></canvas>
-    <!-- 上层：被拨开的颜色 -->
-    <canvas id="top-layer" class="layer"></canvas>
-
+    <canvas id="canvas"></canvas>
     <div class="cursor" id="cursor"></div>
 
     <div class="content">
@@ -171,7 +139,6 @@
         </p>
     </div>
 
-    <div class="bg-hint">划过水面，拨开银河</div>
     <div class="bg-indicator">
         <div class="bg-dot active" data-bg="0"></div>
         <div class="bg-dot" data-bg="1"></div>
@@ -179,170 +146,117 @@
     </div>
 
     <script>
-        // 三种主题：上层颜色 -> 下层颜色
+        // 三种丝绸主题
         const themes = [
             {
                 name: 'pink-blue',
-                top: {      // 上层：粉紫色（被拨开）
-                    colors: ['#e8c4d9', '#d4a5c7', '#c9b8e0'],
-                    base: '#d4a5c7'
-                },
-                bottom: {   // 下层：蓝色（显露出来）
-                    colors: ['#a8c8ec', '#7ab8e8', '#4a90d9'],
-                    base: '#7ab8e8',
-                    stars: ['#ffffff', '#e0f0ff', '#a8d8ff']
-                }
+                top: { colors: ['#e8c4d9', '#d4a5c7', '#c9b8e0'], base: '#d4a5c7' },
+                bottom: { colors: ['#a8c8ec', '#7ab8e8', '#5a9ad9'], stars: ['#ffffff', '#e0f0ff'] }
             },
             {
                 name: 'blue-gold',
-                top: {      // 上层：深蓝色（被拨开）
-                    colors: ['#1a1a4e', '#2d1b69', '#4a2c7a'],
-                    base: '#1a1a4e'
-                },
-                bottom: {   // 下层：金色（显露出来）
-                    colors: ['#ffd700', '#ffb347', '#ff8c42'],
-                    base: '#ffb347',
-                    stars: ['#ffffff', '#fff8dc', '#ffd700']
-                }
+                top: { colors: ['#1a1a4e', '#2d1b69', '#4a2c7a'], base: '#1a1a4e' },
+                bottom: { colors: ['#ffd700', '#ffb347', '#ff8c42'], stars: ['#ffffff', '#fff8dc'] }
             },
             {
                 name: 'orange-gold',
-                top: {      // 上层：橙色（被拨开）
-                    colors: ['#f4a460', '#d4a574', '#c49a6c'],
-                    base: '#d4a574'
-                },
-                bottom: {   // 下层：金黄色（显露出来）
-                    colors: ['#ffd700', '#ffec8b', '#daa520'],
-                    base: '#ffd700',
-                    stars: ['#ffffff', '#fffacd', '#ffe4b5']
-                }
+                top: { colors: ['#f4a460', '#d4a574', '#c49a6c'], base: '#d4a574' },
+                bottom: { colors: ['#ffd700', '#ffec8b', '#daa520'], stars: ['#ffffff', '#fffacd'] }
             }
         ];
 
         let currentTheme = 0;
 
-        const bottomCanvas = document.getElementById('bottom-layer');
-        const topCanvas = document.getElementById('top-layer');
-        const bottomCtx = bottomCanvas.getContext('2d');
-        const topCtx = topCanvas.getContext('2d');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
         let width, height;
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let prevMouseX = mouseX, prevMouseY = mouseY;
-        let mouseTrail = [];
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetMouseX = mouseX;
+        let targetMouseY = mouseY;
 
-        // 噪声函数
-        class SimpleNoise {
-            constructor() {
-                this.perm = new Uint8Array(512);
-                for (let i = 0; i < 256; i++) this.perm[i] = i;
-                for (let i = 255; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [this.perm[i], this.perm[j]] = [this.perm[j], this.perm[i]];
+        // 丝绸变形网格
+        const gridSize = 20;
+        let grid = [];
+        let silkOffset = [];
+
+        function initGrid() {
+            const cols = Math.ceil(width / gridSize) + 1;
+            const rows = Math.ceil(height / gridSize) + 1;
+            grid = [];
+            silkOffset = [];
+
+            for (let i = 0; i < cols; i++) {
+                grid[i] = [];
+                silkOffset[i] = [];
+                for (let j = 0; j < rows; j++) {
+                    grid[i][j] = {
+                        x: i * gridSize,
+                        y: j * gridSize,
+                        vx: 0,
+                        vy: 0
+                    };
+                    silkOffset[i][j] = { x: 0, y: 0 };
                 }
-                for (let i = 0; i < 256; i++) this.perm[i + 256] = this.perm[i];
-            }
-
-            fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
-            lerp(t, a, b) { return a + t * (b - a); }
-            grad(hash, x, y) {
-                const h = hash & 15;
-                const u = h < 8 ? x : y;
-                const v = h < 4 ? y : h === 12 || h === 14 ? x : 0;
-                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
-            }
-
-            noise(x, y) {
-                const X = Math.floor(x) & 255;
-                const Y = Math.floor(y) & 255;
-                x -= Math.floor(x);
-                y -= Math.floor(y);
-                const u = this.fade(x);
-                const v = this.fade(y);
-                const A = this.perm[X] + Y, B = this.perm[X + 1] + Y;
-
-                return this.lerp(v,
-                    this.lerp(u, this.grad(this.perm[A], x, y), this.grad(this.perm[B], x - 1, y)),
-                    this.lerp(u, this.grad(this.perm[A + 1], x, y - 1), this.grad(this.perm[B + 1], x - 1, y - 1))
-                );
             }
         }
 
-        const noise = new SimpleNoise();
-
-        // 绘制流体背景
-        function drawFluid(ctx, colors, time, isBottom) {
-            const imageData = ctx.createImageData(width, height);
-            const data = imageData.data;
-
-            const cx = width / 2;
-            const cy = height / 2;
-            const t = time * 0.0002;
-
-            const colorList = colors.colors;
-            const parsedColors = colorList.map(hex => ({
+        // 绘制丝绸背景
+        function drawSilk(theme, isTop) {
+            const colors = isTop ? theme.top.colors : theme.bottom.colors;
+            const parsedColors = colors.map(hex => ({
                 r: parseInt(hex.slice(1, 3), 16),
                 g: parseInt(hex.slice(3, 5), 16),
                 b: parseInt(hex.slice(5, 7), 16)
             }));
 
-            for (let y = 0; y < height; y += 2) {
-                for (let x = 0; x < width; x += 2) {
-                    const dx = x - cx;
-                    const dy = y - cy;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx);
+            // 绘制扭曲的网格
+            for (let i = 0; i < grid.length - 1; i++) {
+                for (let j = 0; j < grid[i].length - 1; j++) {
+                    const p1 = grid[i][j];
+                    const p2 = grid[i + 1][j];
+                    const p3 = grid[i + 1][j + 1];
+                    const p4 = grid[i][j + 1];
 
-                    // 漩涡扭曲
-                    const twist = angle + dist * 0.003 + t;
-                    const n1 = noise.noise(
-                        Math.cos(twist) * dist * 0.005 + t * 0.5,
-                        Math.sin(twist) * dist * 0.005
-                    );
-                    const n2 = noise.noise(
-                        x * 0.003 + n1 * 0.3,
-                        y * 0.003 + t
-                    );
+                    // 计算颜色
+                    const nx = i / grid.length;
+                    const ny = j / grid[0].length;
+                    const colorIdx = Math.floor((nx + ny) / 2 * (parsedColors.length - 1));
+                    const c = parsedColors[Math.min(colorIdx, parsedColors.length - 1)];
 
-                    const mix = (n1 + 1) * 0.5;
-                    const mix2 = (n2 + 1) * 0.5;
+                    // 添加丝绸光泽变化
+                    const shine = Math.sin(i * 0.3 + j * 0.2) * 20;
+                    const r = Math.min(255, c.r + shine);
+                    const g = Math.min(255, c.g + shine);
+                    const b = Math.min(255, c.b + shine);
 
-                    const colorIdx = Math.floor(mix * (parsedColors.length - 1));
-                    const c1 = parsedColors[colorIdx];
-                    const c2 = parsedColors[Math.min(colorIdx + 1, parsedColors.length - 1)];
-                    const ct = mix * (parsedColors.length - 1) - colorIdx;
-
-                    const r = Math.floor(c1.r + ct * (c2.r - c1.r));
-                    const g = Math.floor(c1.g + ct * (c2.g - c1.g));
-                    const b = Math.floor(c1.b + ct * (c2.b - c1.b));
-
-                    for (let dy = 0; dy < 2 && y + dy < height; dy++) {
-                        for (let dx = 0; dx < 2 && x + dx < width; dx++) {
-                            const i = ((y + dy) * width + (x + dx)) * 4;
-                            data[i] = r;
-                            data[i + 1] = g;
-                            data[i + 2] = b;
-                            data[i + 3] = 255;
-                        }
-                    }
+                    ctx.fillStyle = `rgb(${r},${g},${b})`;
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x + silkOffset[i][j].x, p1.y + silkOffset[i][j].y);
+                    ctx.lineTo(p2.x + silkOffset[i + 1][j].x, p2.y + silkOffset[i + 1][j].y);
+                    ctx.lineTo(p3.x + silkOffset[i + 1][j + 1].x, p3.y + silkOffset[i + 1][j + 1].y);
+                    ctx.lineTo(p4.x + silkOffset[i][j + 1].x, p4.y + silkOffset[i][j + 1].y);
+                    ctx.closePath();
+                    ctx.fill();
                 }
             }
 
-            ctx.putImageData(imageData, 0, 0);
-
-            // 如果是下层，添加星星
-            if (isBottom && colors.stars) {
-                drawStars(ctx, colors.stars, time);
+            // 如果是底层，绘制星星
+            if (!isTop && theme.bottom.stars) {
+                drawStars(theme.bottom.stars);
             }
         }
 
-        function drawStars(ctx, starColors, time) {
-            for (let i = 0; i < 60; i++) {
-                const x = ((i * 137.5 + time * 0.05) % 1) * width;
-                const y = ((i * 73.3 + Math.sin(time * 0.001 + i) * 0.1) % 1) * height;
-                const twinkle = Math.sin(time * 0.003 + i * 0.5);
-                const alpha = 0.4 + 0.4 * twinkle;
-                const size = 0.5 + Math.sin(i) * 0.5;
+        function drawStars(starColors) {
+            const time = Date.now() * 0.001;
+
+            for (let i = 0; i < 50; i++) {
+                const x = ((i * 137.5 + time * 10) % 1) * width;
+                const y = ((i * 73.3 + Math.sin(time + i) * 50) % 1) * height;
+                const twinkle = Math.sin(time * 2 + i);
+                const alpha = 0.5 + 0.3 * twinkle;
+                const size = 1 + Math.sin(i) * 0.5;
 
                 const color = starColors[i % starColors.length];
                 ctx.fillStyle = color;
@@ -352,11 +266,11 @@
                 ctx.arc(x, y, size, 0, Math.PI * 2);
                 ctx.fill();
 
-                if (size > 0.8) {
+                if (size > 1) {
                     ctx.globalAlpha = alpha * 0.5;
                     ctx.strokeStyle = color;
                     ctx.lineWidth = 0.5;
-                    const glow = size * 4;
+                    const glow = size * 3;
                     ctx.beginPath();
                     ctx.moveTo(x - glow, y);
                     ctx.lineTo(x + glow, y);
@@ -368,169 +282,193 @@
             ctx.globalAlpha = 1;
         }
 
-        // 鼠标轨迹系统 - 像墨水一样的软边痕迹
-        class MouseTrailSystem {
-            constructor() {
-                this.points = [];
-                this.maxPoints = 50;
+        // 更新丝绸变形（模拟手指滑过）
+        function updateSilk() {
+            const influenceRadius = 150;
+            const springStrength = 0.1;
+            const damping = 0.85;
+
+            for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    const point = grid[i][j];
+                    const offset = silkOffset[i][j];
+
+                    // 计算到鼠标的距离
+                    const dx = point.x - mouseX;
+                    const dy = point.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < influenceRadius) {
+                        const force = (1 - dist / influenceRadius) * 30;
+                        const angle = Math.atan2(dy, dx);
+
+                        // 丝绸被推开的力
+                        offset.vx = (offset.vx || 0) + Math.cos(angle) * force * 0.3;
+                        offset.vy = (offset.vy || 0) + Math.sin(angle) * force * 0.3;
+                    }
+
+                    // 弹性恢复
+                    offset.vx = (offset.vx || 0) - offset.x * springStrength;
+                    offset.vy = (offset.vy || 0) - offset.y * springStrength;
+
+                    // 阻尼
+                    offset.vx = (offset.vx || 0) * damping;
+                    offset.vy = (offset.vy || 0) * damping;
+
+                    // 应用位移
+                    offset.x += offset.vx;
+                    offset.y += offset.vy;
+                }
             }
+        }
 
-            addPoint(x, y) {
-                this.points.push({
-                    x, y,
-                    time: Date.now(),
-                    size: 80 + Math.random() * 40
-                });
+        // 渲染循环
+        let isDirty = true;
 
-                if (this.points.length > this.maxPoints) {
-                    this.points.shift();
+        function render() {
+            // 平滑插值鼠标位置
+            mouseX += (targetMouseX - mouseX) * 0.15;
+            mouseY += (targetMouseY - mouseY) * 0.15;
+
+            // 更新丝绸变形
+            updateSilk();
+
+            // 清空画布
+            ctx.clearRect(0, 0, width, height);
+
+            const theme = themes[currentTheme];
+
+            // 绘制底层（金色/蓝色星空）
+            drawSilk(theme, false);
+
+            // 使用遮罩绘制上层（被拨开的丝绸）
+            ctx.save();
+
+            // 创建遮罩
+            ctx.beginPath();
+            for (let i = 0; i < grid.length - 1; i++) {
+                for (let j = 0; j < grid[i].length - 1; j++) {
+                    const offset = silkOffset[i][j];
+                    const x = grid[i][j].x + offset.x;
+                    const y = grid[i][j].y + offset.y;
+
+                    // 根据变形程度计算透明度
+                    const deformation = Math.sqrt(offset.x * offset.x + offset.y * offset.y);
+                    const alpha = Math.min(deformation / 50, 0.9);
+
+                    if (alpha > 0.1) {
+                        ctx.globalAlpha = alpha;
+                        ctx.fillStyle = theme.top.base;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 25, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
             }
 
-            // 在顶层画布上"擦除"（使用 destination-out 实现真正的透明）
-            applyToTopLayer(ctx) {
-                const now = Date.now();
-                const fadeTime = 4000; // 4秒恢复
+            ctx.restore();
 
-                ctx.save();
-                ctx.globalCompositeOperation = 'destination-out';
+            // 绘制完整的上层（使用混合模式实现推开效果）
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
 
-                this.points.forEach(point => {
-                    const age = now - point.time;
-                    if (age < fadeTime) {
-                        const opacity = 1 - (age / fadeTime);
-                        const softEdge = point.size * (0.8 + opacity * 0.4);
+            // 创建推开遮罩
+            const maskCanvas = document.createElement('canvas');
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            const maskCtx = maskCanvas.getContext('2d');
 
-                        // 创建软边渐变 - 从中心完全擦除到边缘不擦除
-                        const gradient = ctx.createRadialGradient(
-                            point.x, point.y, 0,
-                            point.x, point.y, softEdge
-                        );
+            // 在遮罩上绘制黑色（不透明）和透明区域
+            maskCtx.fillStyle = 'black';
+            maskCtx.fillRect(0, 0, width, height);
 
-                        gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
-                        gradient.addColorStop(0.4, `rgba(255, 255, 255, ${opacity * 0.7})`);
-                        gradient.addColorStop(0.7, `rgba(255, 255, 255, ${opacity * 0.3})`);
-                        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            // 鼠标周围是透明的（推开区域）
+            for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    const offset = silkOffset[i][j];
+                    const deformation = Math.sqrt(offset.x * offset.x + offset.y * offset.y);
 
-                        ctx.fillStyle = gradient;
-                        ctx.beginPath();
-                        ctx.arc(point.x, point.y, softEdge, 0, Math.PI * 2);
-                        ctx.fill();
+                    if (deformation > 5) {
+                        const x = grid[i][j].x;
+                        const y = grid[i][j].y;
+                        const radius = Math.min(deformation * 0.8, 60);
+
+                        const gradient = maskCtx.createRadialGradient(x, y, 0, x, y, radius);
+                        gradient.addColorStop(0, `rgba(0,0,0,${1 - Math.min(deformation / 50, 0.95)})`);
+                        gradient.addColorStop(1, 'black');
+
+                        maskCtx.fillStyle = gradient;
+                        maskCtx.beginPath();
+                        maskCtx.arc(x, y, radius, 0, Math.PI * 2);
+                        maskCtx.fill();
                     }
-                });
-
-                ctx.restore();
-
-                // 清理旧点
-                this.points = this.points.filter(p => now - p.time < fadeTime);
+                }
             }
-        }
 
-        const trailSystem = new MouseTrailSystem();
+            // 使用遮罩
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(maskCanvas, 0, 0);
+
+            // 绘制上层丝绸
+            ctx.globalCompositeOperation = 'source-over';
+            drawSilk(theme, true);
+
+            ctx.restore();
+
+            // 更新光标
+            const cursor = document.getElementById('cursor');
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+
+            requestAnimationFrame(render);
+        }
 
         function init() {
             resize();
+            render();
         }
 
         function resize() {
-            width = bottomCanvas.width = topCanvas.width = window.innerWidth;
-            height = bottomCanvas.height = topCanvas.height = window.innerHeight;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initGrid();
         }
 
-        let lastTime = 0;
-        let time = 0;
-
-        function animate(timestamp) {
-            time += 16;
-
-            // 每帧重新绘制底层（动态效果）
-            const theme = themes[currentTheme];
-            drawFluid(bottomCtx, theme.bottom, time, true);
-
-            // 绘制顶层（静态或慢速变化）
-            if (time - lastTime > 100) { // 降低顶层刷新频率
-                drawFluid(topCtx, theme.top, time * 0.3, false);
-                lastTime = time;
-            }
-
-            // 应用鼠标轨迹（"拨开"效果）
-            trailSystem.applyToTopLayer(topCtx);
-
-            requestAnimationFrame(animate);
-        }
-
-        // 初始化光标
-        const cursorEl = document.getElementById('cursor');
-        cursorEl.style.left = mouseX + 'px';
-        cursorEl.style.top = mouseY + 'px';
-
+        // 鼠标事件
         document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            // 添加轨迹点
-            const dx = mouseX - prevMouseX;
-            const dy = mouseY - prevMouseY;
-            const speed = Math.sqrt(dx * dx + dy * dy);
-
-            if (speed > 5) {
-                trailSystem.addPoint(mouseX, mouseY);
-            }
-
-            prevMouseX = mouseX;
-            prevMouseY = mouseY;
-
-            // 更新光标位置
-            cursorEl.style.left = e.clientX + 'px';
-            cursorEl.style.top = e.clientY + 'px';
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
         });
 
         document.addEventListener('mousedown', () => {
-            cursorEl.classList.add('active');
-            // 点击产生大范围的"拨开"
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    trailSystem.addPoint(
-                        mouseX + (Math.random() - 0.5) * 60,
-                        mouseY + (Math.random() - 0.5) * 60
-                    );
-                }, i * 50);
-            }
+            document.getElementById('cursor').classList.add('dragging');
         });
 
         document.addEventListener('mouseup', () => {
-            cursorEl.classList.remove('active');
+            document.getElementById('cursor').classList.remove('dragging');
         });
 
         // 触摸支持
         document.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            const dx = touch.clientX - prevMouseX;
-            const dy = touch.clientY - prevMouseY;
-            const speed = Math.sqrt(dx * dx + dy * dy);
-
-            if (speed > 5) {
-                trailSystem.addPoint(touch.clientX, touch.clientY);
-            }
-
-            prevMouseX = touch.clientX;
-            prevMouseY = touch.clientY;
+            targetMouseX = touch.clientX;
+            targetMouseY = touch.clientY;
         }, { passive: true });
 
         // 切换主题
         function switchTheme(index) {
-            if (index === undefined) {
-                currentTheme = (currentTheme + 1) % 3;
-            } else {
-                currentTheme = index;
-            }
+            currentTheme = index !== undefined ? index : (currentTheme + 1) % 3;
 
             document.querySelectorAll('.bg-dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === currentTheme);
             });
 
-            // 清空轨迹，重新开始
-            trailSystem.points = [];
+            // 重置丝绸变形
+            for (let i = 0; i < silkOffset.length; i++) {
+                for (let j = 0; j < silkOffset[i].length; j++) {
+                    silkOffset[i][j] = { x: 0, y: 0, vx: 0, vy: 0 };
+                }
+            }
         }
 
         document.addEventListener('click', (e) => {
@@ -547,8 +485,8 @@
 
         window.addEventListener('resize', resize);
 
+        // 初始化
         init();
-        requestAnimationFrame(animate);
     </script>
 </body>
 </html>
