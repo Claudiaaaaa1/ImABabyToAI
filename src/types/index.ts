@@ -5,7 +5,7 @@ export interface WeChatMessage {
   id: string;
   localId: string;
   sender: {
-    id: 'me' | 'ex';
+    id: 'me' | 'ex' | 'system';
     name: string;
     avatar: string;
   };

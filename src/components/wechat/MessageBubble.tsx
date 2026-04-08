@@ -9,6 +9,18 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isMe = message.sender.id === 'me';
+  const isSystem = message.sender.id === 'system';
+
+  // 系统消息显示为居中灰色小字
+  if (isSystem) {
+    return (
+      <div className="flex justify-center my-2">
+        <span className="text-xs text-[var(--wx-text-secondary)] bg-[var(--wx-bg-tertiary)] px-3 py-1 rounded-full">
+          {message.content.text}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={cn(
