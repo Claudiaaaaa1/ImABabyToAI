@@ -24,7 +24,7 @@ export function SkillImporter() {
       },
       memoryBank: { coreMemories: [] },
       behavior: {
-        responseDelay: { min: 1000, max: 3000 },
+        responseDelay: { min: 200, max: 1500 },
         typingSpeed: 50,
         emojiFrequency: 0.3,
         readReceiptDelay: 2000,
